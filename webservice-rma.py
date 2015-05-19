@@ -71,7 +71,7 @@ print "Creando ordenes de compra"
 
 currency_id = _get_id_from_xml_id('EUR', 'base')[0]
 lote_ids = []
-for pur in xrange(1, 5):
+for pur in xrange(1, 300):
     partner_num = random.randint(1, 26)
     partner_id = _get_id_from_xml_id('res_partner_' +
                                      str(partner_num), 'base')[0]
@@ -104,7 +104,7 @@ for pur in xrange(1, 5):
             'price_unit': product.standard_price,
             'date_planned': '2015-05-08',
             })
-        oerp.exec_workflow('purchase.order', 'purchase_confirm', purchase_id)
+    oerp.exec_workflow('purchase.order', 'purchase_confirm', purchase_id)
     purchase_brw = purchase_obj.browse(purchase_id)
     for picking in purchase_brw.picking_ids:
         wizard_transfer_id = oerp.execute('stock.transfer_details', 'create', {
@@ -112,7 +112,6 @@ for pur in xrange(1, 5):
             'sourceloc_id': picking.location_id.id,
             'destinationloc_id': picking.location_dest_id.id,
             })
-        print "lengt de move_lines %s" % len(picking.move_lines)
         for stock_move in picking.move_lines:
             lot_id = oerp.execute('stock.production.lot', 'create', {
                 'product_id': stock_move.product_id.id,
@@ -136,7 +135,7 @@ for pur in xrange(1, 5):
 print "Creando ordenes de venta"
 partner_id = _get_id_from_xml_id('res_partner_26', 'base')[0]
 num_lot = 0
-for sale in xrange(1, 5):
+for sale in xrange(1, 300):
     print "Creando orden de sale %s" % sale
     sale_id = oerp.execute('sale.order', 'create', {
         'company_id': company_id,
