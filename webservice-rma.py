@@ -2,6 +2,11 @@ import oerplib
 from random import *
 import random
 
+DB = 'rma_demo'
+NUM_SALE =
+NUM_PURCHASE =
+MODULES_TO_INSTALL = ['rma']
+
 def _get_id_from_xml_id(xml_id, module):
     """
     Returns id of object to get
@@ -24,15 +29,16 @@ oerp = oerplib.OERP()
 oerp.config['timeout']=4000
 db = raw_input('Do you want to create a new database before continuing? [y/N]:')
 if db == 'y':
-    oerp.db.drop('admin', 'serial_number')
+    oerp.db.drop('admin', DB)
     print 'CREATING A NEW DATABASE'
-    oerp.db.create_database('admin', 'serial_number', True, 'en_US', 'admin')
-    oerp.login(database='serial_number')
+    oerp.db.create_database('admin', DB, True, 'en_US', 'admin')
+    oerp.login(database=DB)
     module_obj = oerp.get('ir.module.module')
-    module_id = module_obj.search([('name', '=', 'rma')])
-    module_obj.button_immediate_install(module_id)
+    for module in MODULES_TO_INSTALL:
+        module_id = module_obj.search([('name', '=', module)])
+        module_obj.button_immediate_install(module_id)
 else:
-    oerp.login(database='serial_number')
+    oerp.login(database=DB)
 res_users_obj = oerp.get('res.users')
 user_id = res_users_obj.search([('login', '=', 'admin')])
 user = res_users_obj.browse( user_id[0] )
@@ -57,21 +63,11 @@ purchase_obj = oerp.get('purchase.order')
 sale_obj = oerp.get('sale.order')
 lot_obj = oerp.get('stock.production.lot')
 
-# oerp.execute('res.company','write',[company_id],{
-#     'printer_fiscal':True,
-#     'vat_check_vies':True,
-#     })
-
 #Creating Purchase Journal
 print "Creando ordenes de compra"
-# partner_num = 5
-# supplier_num = 5
-# partner_id = _get_id_from_xml_id('res_partner_' + str(partner_num), 'base')[0]
-# supplier_id = _get_id_from_xml_id('res_partner_' + str(supplier_num), 'base')[0]
-
 currency_id = _get_id_from_xml_id('EUR', 'base')[0]
 lote_ids = []
-for pur in xrange(1, 5000):
+for pur in xrange(1, NUM_PURCHASE):
     partner_num = random.randint(1, 26)
     partner_id = _get_id_from_xml_id('res_partner_' +
                                      str(partner_num), 'base')[0]
@@ -88,7 +84,6 @@ for pur in xrange(1, 5000):
         'pricelist_id': pricelist.id,
         })
 
-    #num_lines = random.randint(2, 7)
     num_lines = 20
     for line in xrange(1, num_lines):
         prod_num = random.randint(5, 8)
@@ -109,8 +104,6 @@ for pur in xrange(1, 5000):
     for picking in purchase_brw.picking_ids:
         wizard_transfer_id = oerp.execute('stock.transfer_details', 'create', {
             'picking_id': picking.id,
-            'sourceloc_id': picking.location_id.id,
-            'destinationloc_id': picking.location_dest_id.id,
             })
         for stock_move in picking.move_lines:
             lot_id = oerp.execute('stock.production.lot', 'create', {
@@ -137,7 +130,7 @@ for pur in xrange(1, 5000):
 print "Creando ordenes de venta"
 partner_id = _get_id_from_xml_id('res_partner_26', 'base')[0]
 num_lot = 0
-for sale in xrange(1, 5000):
+for sale in xrange(1, NUM_SALE):
     print "Creando orden de sale %s" % sale
     sale_id = oerp.execute('sale.order', 'create', {
         'name': 'Sale Order %s' % sale,
@@ -151,7 +144,6 @@ for sale in xrange(1, 5000):
         'warehouse_id': warehouse.id,
         })
 
-    # num_lines = random.randint(2, 4)
     num_lines = 20
     sale_lot_lines = []
     print "*" * 100
@@ -177,6 +169,7 @@ for sale in xrange(1, 5000):
             'product_uom_qty': 1,
             })
         oerp.execute('sale.order', 'action_button_confirm', [sale_id])
+
     sale_brw = sale_obj.browse(sale_id)
     for picking in sale_brw.picking_ids:
         wizard_transfer_id = oerp.execute('stock.transfer_details', 'create', {
