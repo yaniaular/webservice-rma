@@ -3,9 +3,9 @@ from random import *
 import random
 
 DB = 'rma_demo'
-NUM_SALE =
-NUM_PURCHASE =
-MODULES_TO_INSTALL = ['rma']
+NUM_SALE  = 5
+NUM_PURCHASE = 5
+MODULES_TO_INSTALL = ['rma', 'yoytec_customer_rma_workflow']
 
 def _get_id_from_xml_id(xml_id, module):
     """
@@ -39,6 +39,13 @@ if db == 'y':
         module_obj.button_immediate_install(module_id)
 else:
     oerp.login(database=DB)
+    mod = raw_input('Do you want install the modules? [y/N]:')
+    if mod == 'y':
+        module_obj = oerp.get('ir.module.module')
+        for module in MODULES_TO_INSTALL:
+            module_id = module_obj.search([('name', '=', module)])
+            module_obj.button_immediate_install(module_id)
+
 res_users_obj = oerp.get('res.users')
 user_id = res_users_obj.search([('login', '=', 'admin')])
 user = res_users_obj.browse( user_id[0] )
@@ -168,7 +175,7 @@ for sale in xrange(1, NUM_SALE):
             'product_id': product.id,
             'product_uom_qty': 1,
             })
-        oerp.execute('sale.order', 'action_button_confirm', [sale_id])
+    oerp.execute('sale.order', 'action_button_confirm', [sale_id])
 
     sale_brw = sale_obj.browse(sale_id)
     for picking in sale_brw.picking_ids:
