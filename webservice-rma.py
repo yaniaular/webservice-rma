@@ -55,6 +55,15 @@ group_warehouse_id = _get_id_from_xml_id('group_locations', 'stock')[0]
 user.groups_id += [group_technical_id, group_stock_id, group_warehouse_id]
 oerp.write_record(user)
 
+
+config_id = oerp.execute('stock.config.settings', 'create',{
+                         'group_stock_multiple_locations': True,
+                         'group_stock_adv_location': True,
+                         'group_stock_production_lot': True,
+                         'module_product_expiry': True,})
+oerp.execute('stock.config.settings', 'execute', [config_id])
+
+
 company_id = user.company_id.id
 
 warehouse_obj = oerp.get('stock.warehouse')
