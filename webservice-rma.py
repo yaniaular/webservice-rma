@@ -5,7 +5,7 @@ import random
 DB = 'rma_demo'
 NUM_SALE  = 5
 NUM_PURCHASE = 5
-MODULES_TO_INSTALL = ['rma', 'yoytec_customer_rma_workflow']
+MODULES_TO_INSTALL = ['rma', 'yoytec']
 
 def _get_id_from_xml_id(xml_id, module):
     """
@@ -52,7 +52,9 @@ user = res_users_obj.browse( user_id[0] )
 group_technical_id = _get_id_from_xml_id('group_no_one', 'base')[0]
 group_stock_id = _get_id_from_xml_id('group_production_lot', 'stock')[0]
 group_warehouse_id = _get_id_from_xml_id('group_locations', 'stock')[0]
-user.groups_id += [group_technical_id, group_stock_id, group_warehouse_id]
+group_address_sale = _get_id_from_xml_id('group_delivery_invoice_address', 'sale')[0]
+user.groups_id += [group_technical_id, group_stock_id, group_warehouse_id,
+                   group_address_sale]
 oerp.write_record(user)
 
 
@@ -116,6 +118,7 @@ for pur in xrange(1, NUM_PURCHASE):
             'date_planned': '2015-05-08',
             })
     oerp.exec_workflow('purchase.order', 'purchase_confirm', purchase_id)
+    oerp.exec_workflow('purchase.order', 'purchase_approve', purchase_id)
     purchase_brw = purchase_obj.browse(purchase_id)
     for picking in purchase_brw.picking_ids:
         wizard_transfer_id = oerp.execute('stock.transfer_details', 'create', {
