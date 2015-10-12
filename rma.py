@@ -1,10 +1,11 @@
 import oerplib
 from random import *
 import random
+import pdb
 
 
-DB = 'rma_vauxoo'
-MODULES_TO_INSTALL = ['rma']
+DB = 'rma'
+MODULES_TO_INSTALL = ['yoytec']
 
 def _get_id_from_xml_id(xml_id, module):
     """
@@ -105,7 +106,7 @@ partner_id = _get_id_from_xml_id('res_partner_1', 'base')[0] #ASUSTek
 
 print "Creando orden de compra iPads Mini"
 
-purchase_id = create_purchase_order('Order Ipads Mini from ASUSTeK', partner_id)
+purchase_id = create_purchase_order('Order Ipads Mini from ASUSTeK 2', partner_id)
 
 product_id = _get_id_from_xml_id('product_product_6', 'product')[0]
 product = product_obj.browse(product_id)
@@ -222,7 +223,6 @@ sale_id = oerp.execute('sale.order', 'create', {
     'date_order': '2015-05-05 18:17:05',
     'order_policy': 'manual',
     'picking_policy': 'direct',
-    'location_id': warehouse.wh_input_stock_loc_id.id,
     'warehouse_id': warehouse.id,
     })
 

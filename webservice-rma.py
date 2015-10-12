@@ -5,7 +5,7 @@ import random
 DB = 'rma_demo'
 NUM_SALE  = 5
 NUM_PURCHASE = 5
-MODULES_TO_INSTALL = ['rma', 'yoytec']
+MODULES_TO_INSTALL = ['yoytec_customer_rma_workflow']
 
 def _get_id_from_xml_id(xml_id, module):
     """

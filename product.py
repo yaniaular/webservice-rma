@@ -30,11 +30,3 @@ oerp.config['timeout']=4000
 oerp.login(database=DB)
 
 
-product_obj = oerp.get('product.product')
-
-for prod_num in xrange(2, 14):
-    product_id = _get_id_from_xml_id('product_product_' +
-                                        str(prod_num), 'product')[0]
-    product = product_obj.browse(product_id)
-    product.warranty = 5.0
-    oerp.write_record(product)
